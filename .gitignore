@@ -1,0 +1,8 @@
+*:Zone.Identifier
+payload.json
+site/
+.clasp.json
+dev/
+.DS_Store
+node_modules/
+.env

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #EDE4D4; }
+  a { color: #C0442E; text-decoration: none; }
+  a:hover { color: #8F2F1F; text-decoration: underline; }
+</style>
+</helmet>
+<div style="font-family: 'Instrument Sans', system-ui, sans-serif; background: #EDE4D4; color: #241F1A; min-height: 100%; box-sizing: border-box; padding: 14px; display: flex; flex-direction: column; gap: 14px; max-width: 1240px; margin: 0 auto; text-wrap: pretty;">
+
+  <div style="background: #241F1A; color: #FBF6EC; border-radius: 12px; padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; justify-content: space-between;">
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #C8A15E;">Season 1</div>
+        <div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 30px; line-height: 1.02; letter-spacing: -0.02em;">{{ seasonName }}</div>
+      </div>
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <div style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; white-space: nowrap; background: #FBF6EC; color: #241F1A; border-radius: 999px; padding: 5px 10px;">DAY {{ dayNum }} / {{ dayTotal }}</div>
+        <div style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; white-space: nowrap; border: 1px solid #5B534A; border-radius: 999px; padding: 5px 10px; color: #E4D9C4;">{{ daysLeft }} DAYS LEFT</div>
+      </div>
+    </div>
+    <div style="height: 6px; border-radius: 999px; background: #433B32; overflow: hidden;">
+      <div style="{{ progressStyle }}"></div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; background: #332C25; border-radius: 8px; padding: 8px 10px;">
+      <div style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.16em; color: #A29683;">LEADING</div>
+      <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px;">{{ leaderBlock }}</div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start;">
+
+    <div style="flex: 1 1 360px; min-width: 296px; background: #FBF6EC; border: 2px solid #241F1A; border-radius: 12px; box-shadow: 4px 4px 0 rgba(36,31,26,0.16); padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 0 2px;">
+        <div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: -0.01em;">The Board</div>
+        <div style="font-family: 'Space Mono', monospace; font-size: 10px; color: #6E645A;">100 TILES</div>
+      </div>
+
+      <div style="position: relative;">
+        <div style="position: relative; display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; aspect-ratio: 1 / 1;">
+          <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="100">
+            <div style="{{ t.style }}">
+              <div style="position: absolute; top: 1px; left: 3px; font-family: 'Space Mono', monospace; font-size: 8px; line-height: 1; color: #8E8378;">{{ t.n }}</div>
+              <div style="{{ t.glyphStyle }}">{{ t.glyph }}</div>
+              <div style="position: absolute; bottom: 1px; left: 0; right: 0; display: flex; justify-content: center; align-items: flex-end;">
+                <sc-for list="{{ t.tokens }}" as="k" hint-placeholder-count="0">
+                  <div style="{{ k.style }}">{{ k.initials }}</div>
+                </sc-for>
+                <sc-if value="{{ t.more }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; background: #241F1A; color: #FBF6EC; border-radius: 999px; padding: 1px 3px; margin-left: 1px;">{{ t.more }}</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+          <svg viewBox="0 0 10 10" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+            <sc-for list="{{ connectors }}" as="c" hint-placeholder-count="0">
+              <line x1="{{ c.x1 }}" y1="{{ c.y1 }}" x2="{{ c.x2 }}" y2="{{ c.y2 }}" stroke="{{ c.color }}" stroke-width="0.09" stroke-linecap="round" stroke-dasharray="{{ c.dash }}" opacity="0.5"></line>
+            </sc-for>
+          </svg>
+        </div>
+      </div>
+
+      <div style="border: 2px dashed #C9BCA6; border-radius: 8px; padding: 7px 9px; display: flex; align-items: center; gap: 9px; min-height: 34px;">
+        <div style="font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: #6E645A; flex: 0 0 auto;">START</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 3px; align-items: center;">
+          <sc-for list="{{ startTokens }}" as="k" hint-placeholder-count="0">
+            <div style="{{ k.style }}">{{ k.initials }}</div>
+          </sc-for>
+        </div>
+        <div style="font-size: 12px; color: #6E645A; font-style: italic;">{{ startNote }}</div>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 4px 10px; padding: 2px 2px 0;">
+        <sc-for list="{{ legend }}" as="l" hint-placeholder-count="5">
+          <div style="display: flex; align-items: center; gap: 5px;">
+            <div style="{{ l.swatch }}"></div>
+            <div style="font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.06em; color: #5C5349; white-space: nowrap;">{{ l.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="flex: 1 1 300px; min-width: 280px; background: #FBF6EC; border: 2px solid #241F1A; border-radius: 12px; box-shadow: 4px 4px 0 rgba(36,31,26,0.16); padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 15px;">Standings</div>
+        <div style="font-family: 'Space Mono', monospace; font-size: 10px; color: #6E645A;">BAGS ARE PRIVATE</div>
+      </div>
+      <div style="font-size: 11px; line-height: 1.35; color: #7A705F; background: #F4EDDF; border-radius: 7px; padding: 7px 9px; margin-top: -3px;">Nobody can see what anyone is holding. You find out someone had a Shield when it stops your hit. Check your own bag in Slack with <span style="font-family: 'Space Mono', monospace; background: #E7DFCF; padding: 1px 4px; border-radius: 3px;">/bag</span>.</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <sc-for list="{{ standings }}" as="p" hint-placeholder-count="8">
+          <div style="{{ p.rowStyle }}">
+            <div style="font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; width: 20px; text-align: right; color: #8E8378;">{{ p.rank }}</div>
+            <div style="{{ p.avatarStyle }}">{{ p.initials }}</div>
+            <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <div style="font-weight: 700; font-size: 14px; line-height: 1.1;">{{ p.name }}</div>
+                <sc-if value="{{ p.badge }}" hint-placeholder-val="{{ false }}">
+                  <div style="{{ p.badgeStyle }}">{{ p.badge }}</div>
+                </sc-if>
+              </div>
+              <div style="{{ p.lastSeenStyle }}">{{ p.lastSeen }}</div>
+            </div>
+            <div style="text-align: right; flex: 0 0 auto;">
+              <div style="font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700; line-height: 1;">{{ p.tile }}</div>
+              <div style="{{ p.deltaStyle }}">{{ p.delta }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="flex: 1 1 100%; background: #FBF6EC; border: 2px solid #241F1A; border-radius: 12px; box-shadow: 4px 4px 0 rgba(36,31,26,0.16); padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 15px;">Activity</div>
+        <div style="font-family: 'Space Mono', monospace; font-size: 10px; color: #6E645A;">{{ feedMeta }}</div>
+      </div>
+
+      <sc-if value="{{ feedEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="border: 2px dashed #C9BCA6; border-radius: 10px; padding: 28px 14px; text-align: center; display: flex; flex-direction: column; gap: 4px;">
+          <div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px;">The season starts here.</div>
+          <div style="font-size: 13px; color: #6E645A;">Type <span style="font-family: 'Space Mono', monospace; background: #EFE7D9; padding: 1px 5px; border-radius: 4px;">/roll</span> in #ladderboard to open Day 1.</div>
+        </div>
+      </sc-if>
+
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <sc-for list="{{ feed }}" as="f" hint-placeholder-count="9">
+          <div style="{{ f.rowStyle }}">
+            <div style="{{ f.railStyle }}"></div>
+            <div style="{{ f.avatarStyle }}">{{ f.initials }}</div>
+            <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+              <div style="{{ f.textStyle }}">{{ f.text }}</div>
+              <div style="display: flex; gap: 7px; align-items: center;">
+                <div style="{{ f.kindStyle }}">{{ f.kind }}</div>
+                <div style="font-family: 'Space Mono', monospace; font-size: 10px; color: #8E8378;">{{ f.time }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align: center; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: #6E645A; border-top: 1px dashed #D8CCB8; padding-top: 9px;">SHOWING LAST 50 OF 214 ACTIONS</div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="text-align: center; font-family: 'Space Mono', monospace; font-size: 10px; color: #8E8378; padding-bottom: 8px;">READ-ONLY BOARD · ACT IN SLACK · UPDATED 2 MIN AGO</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;emptyState&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Board state&quot;},&quot;showConnectors&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Board state&quot;},&quot;seasonName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;The Long Climb&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Season&quot;}}">
+const PLAYERS = [
+  { id: 'priya',   name: 'Priya',   initials: 'PR', color: 'oklch(0.60 0.17 25)',  tile: 47, delta: 6, lastSeen: 'Pulled back 6 by Dev, 2h ago' },
+  { id: 'michael', name: 'Michael', initials: 'MK', color: 'oklch(0.55 0.16 255)', tile: 41, delta: 5, lastSeen: 'Hit a power-up tile, 4h ago' },
+  { id: 'dev',     name: 'Dev',     initials: 'DV', color: 'oklch(0.55 0.15 150)', tile: 41, delta: 8, lastSeen: 'Spent an extra die, 6h ago' },
+  { id: 'ana',     name: 'Ana',     initials: 'AN', color: 'oklch(0.60 0.17 350)', tile: 41, delta: 2, lastSeen: 'Rolled a 3, 3h ago' },
+  { id: 'tom',     name: 'Tom',     initials: 'TM', color: 'oklch(0.60 0.16 65)',  tile: 36, delta: 3, lastSeen: 'Hit a setback on 44, 5h ago' },
+  { id: 'luis',    name: 'Luis',    initials: 'LS', color: 'oklch(0.55 0.13 115)', tile: 39, delta: 4, lastSeen: 'Took the shortcut from 20, 6h ago' },
+  { id: 'jenny',   name: 'Jenny',   initials: 'JN', color: 'oklch(0.55 0.17 310)', tile: 12, delta: 0, lastSeen: 'Stunned by Sam, 9h ago', stunned: true },
+  { id: 'sam',     name: 'Sam',     initials: 'SM', color: 'oklch(0.58 0.13 195)', tile: 9,  delta: 2, lastSeen: 'Rolled a 2, 14h ago' }
+];
+
+// Shortcuts (up) and Setbacks (down). Every tile below is unique: no tile is
+// ever two things at once, and no power-up tile sits on a shortcut or setback.
+const LADDERS = { 4: 22, 9: 31, 20: 39, 28: 55, 51: 72, 63: 81, 71: 91 };
+const SNAKES = { 17: 7, 44: 36, 54: 33, 62: 19, 87: 24, 93: 68, 98: 79 };
+const POWER = [3, 6, 11, 12, 14, 25, 29, 34, 37, 41, 45, 48, 52, 57, 60, 66, 70, 74, 78, 83, 88, 95];
+
+const ITEM_META = {
+  die:    { label: 'DIE',    fg: '#2F5B7D', bg: '#DDEAF3' },
+  stun:   { label: 'STUN',   fg: '#8A2E6A', bg: '#F5DFEE' },
+  pull:   { label: 'PULL',   fg: '#B0451F', bg: '#FAE0D3' },
+  warp:   { label: 'WARP',   fg: '#5A3FA0', bg: '#E6E0F7' },
+  shield: { label: 'SHIELD', fg: '#2F7D4F', bg: '#DDF0E2' }
+};
+
+const KIND_META = {
+  roll:   { label: 'ROLL',      color: '#6E645A' },
+  ladder: { label: 'SHORTCUT',  color: '#2F7D4F' },
+  snake:  { label: 'SETBACK',   color: '#C0442E' },
+  pickup: { label: 'PICKUP',    color: '#B4791A' },
+  use:    { label: 'POWER-UP',  color: '#7A34A8' },
+  reset:  { label: 'RESET',     color: '#8E8378' }
+};
+
+const FEED = [
+  { t: '2h ago',    who: 'dev',     kind: 'use',    text: 'Dev used PULL on Priya. Priya fell from 53 to 47.' },
+  { t: '3h ago',    who: 'ana',     kind: 'roll',   text: 'Ana rolled a 3, landed on 41. Three of you are on that tile now.' },
+  { t: '4h ago',    who: 'michael', kind: 'pickup', text: 'Michael rolled a 5, landed on 41 — a power-up tile. Something went into his bag.' },
+  { t: '5h ago',    who: 'tom',     kind: 'snake',  text: 'Tom rolled a 6, landed on 44, hit a setback. Slid to 36.' },
+  { t: '6h ago',    who: 'luis',    kind: 'ladder', text: 'Luis rolled a 3, landed on 20, took the shortcut. Climbed to 39.' },
+  { t: '8h ago',    who: 'dev',     kind: 'use',    text: 'Dev used an EXTRA DIE. Rolled a 4. Tile 37 to 41.' },
+  { t: '9h ago',    who: 'sam',     kind: 'use',    text: 'Jenny was STUNNED by Sam. No free die tomorrow.' },
+  { t: '11h ago',   who: 'priya',   kind: 'pickup', text: 'Priya rolled a 1, landed on 52 — a power-up tile. Nobody knows what she got.' },
+  { t: 'Yesterday', who: null,      kind: 'reset',  text: 'Daily dice granted to 7 players. Jenny was stunned and got none.' }
+];
+
+class Component extends DCLogic {
+  tileCenter(n) {
+    const idx = n - 1, row = Math.floor(idx / 10), c = idx % 10;
+    const col = row % 2 === 0 ? c : 9 - c;
+    return { x: col + 0.5, y: 9 - row + 0.5 };
+  }
+
+  token(p, size) {
+    const ring = p.stunned ? '#241F1A' : '#FBF6EC';
+    return {
+      initials: p.initials,
+      style: {
+        width: size, height: size, borderRadius: '999px', background: p.color,
+        color: '#FFF9EE', fontFamily: "'Space Mono', monospace", fontWeight: 700,
+        fontSize: Math.max(7, Math.round(size * 0.44)) + 'px', letterSpacing: '-0.02em',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+        boxShadow: '0 1px 0 rgba(36,31,26,0.35)',
+        border: (p.stunned ? '2px dashed ' : '2px solid ') + ring,
+        boxSizing: 'border-box', marginLeft: '-4px',
+        filter: p.stunned ? 'grayscale(0.55)' : 'none'
+      }
+    };
+  }
+
+  renderVals() {
+    const empty = !!this.props.emptyState;
+    const showConn = this.props.showConnectors !== false;
+    const players = PLAYERS.map(p => empty ? { ...p, tile: 0, delta: 0, items: [], stunned: false } : p);
+
+    const byTile = {};
+    players.forEach(p => { (byTile[p.tile] = byTile[p.tile] || []).push(p); });
+
+    const tiles = [];
+    for (let row = 9; row >= 0; row--) {
+      const base = row * 10;
+      const nums = [];
+      for (let c = 0; c < 10; c++) nums.push(base + c + 1);
+      if (row % 2 === 1) nums.reverse();
+      nums.forEach(n => {
+        const isLadderFoot = LADDERS[n] !== undefined;
+        const isLadderTop = Object.values(LADDERS).indexOf(n) >= 0;
+        const isSnakeHead = SNAKES[n] !== undefined;
+        const isSnakeTail = Object.values(SNAKES).indexOf(n) >= 0;
+        const isPower = POWER.indexOf(n) >= 0;
+        const finish = n === 100;
+        let bg = (row % 2 === 0) ? '#FFFDF7' : '#F7F1E4';
+        let border = '1px solid rgba(36,31,26,0.10)';
+        let glyph = '', gcolor = '';
+        if (isPower) { bg = '#FBEFD2'; glyph = '◆'; gcolor = '#B4791A'; }
+        if (isLadderTop || isSnakeTail) { bg = isLadderTop ? '#E9F4EB' : '#FAEDE8'; }
+        if (isLadderFoot) { bg = '#DCF0E1'; glyph = '▲'; gcolor = '#2F7D4F'; border = '1px solid rgba(47,125,79,0.45)'; }
+        if (isSnakeHead) { bg = '#F9DED4'; glyph = '▼'; gcolor = '#C0442E'; border = '1px solid rgba(192,68,46,0.45)'; }
+        if (finish) { bg = '#241F1A'; glyph = '★'; gcolor = '#C8A15E'; }
+        const here = byTile[n] || [];
+        const shown = here.slice(0, 2).map(p => this.token(p, 17));
+        tiles.push({
+          n,
+          style: {
+            position: 'relative', background: bg, border, borderRadius: '4px',
+            aspectRatio: '1 / 1', overflow: 'visible'
+          },
+          glyph,
+          glyphStyle: {
+            position: 'absolute', inset: 0, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', fontSize: '10px', color: gcolor, lineHeight: 1
+          },
+          tokens: shown,
+          more: here.length > 2 ? '+' + (here.length - 2) : ''
+        });
+      });
+    }
+
+    const connectors = [];
+    if (showConn) {
+      Object.keys(LADDERS).forEach(k => {
+        const a = this.tileCenter(+k), b = this.tileCenter(LADDERS[k]);
+        connectors.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y, color: '#2F7D4F', dash: '0.28 0.16' });
+      });
+      Object.keys(SNAKES).forEach(k => {
+        const a = this.tileCenter(+k), b = this.tileCenter(SNAKES[k]);
+        connectors.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y, color: '#C0442E', dash: '' });
+      });
+    }
+
+    const swatch = (bg, bd) => ({ width: '11px', height: '11px', borderRadius: '3px', background: bg, border: '1px solid ' + bd });
+    const legend = [
+      { label: 'SHORTCUT', swatch: swatch('#DCF0E1', 'rgba(47,125,79,0.5)') },
+      { label: 'SETBACK', swatch: swatch('#F9DED4', 'rgba(192,68,46,0.5)') },
+      { label: 'POWER-UP', swatch: swatch('#FBEFD2', 'rgba(180,121,26,0.5)') },
+      { label: 'FINISH', swatch: swatch('#241F1A', '#241F1A') }
+    ];
+
+    const sorted = players.slice().sort((a, b) => b.tile - a.tile || a.name.localeCompare(b.name));
+    let lastTile = null, lastRank = 0;
+    const standings = sorted.map((p, i) => {
+      const rank = p.tile === lastTile ? lastRank : i + 1;
+      lastTile = p.tile; lastRank = rank;
+      const tied = sorted.filter(q => q.tile === p.tile).length > 1;
+      return {
+        rank: (tied ? 'T' : '') + rank,
+        name: p.name,
+        initials: p.initials,
+        tile: empty ? '—' : p.tile,
+        delta: empty ? 'day 1' : (p.delta > 0 ? '+' + p.delta + ' today' : '0 today'),
+        deltaStyle: {
+          fontFamily: "'Space Mono', monospace", fontSize: '9px', letterSpacing: '0.02em',
+          color: p.delta > 0 && !empty ? '#2F7D4F' : '#8E8378', whiteSpace: 'nowrap'
+        },
+        rowStyle: {
+          display: 'flex', alignItems: 'center', gap: '9px', padding: '8px 9px',
+          borderRadius: '8px', background: p.stunned ? '#F3E7E2' : '#FFFDF7',
+          border: '1px solid ' + (p.stunned ? 'rgba(192,68,46,0.35)' : 'rgba(36,31,26,0.10)')
+        },
+        avatarStyle: {
+          width: '30px', height: '30px', borderRadius: '999px', background: p.color,
+          color: '#FFF9EE', fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: '12px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+          border: p.stunned ? '2px dashed #241F1A' : '2px solid rgba(36,31,26,0.18)',
+          boxSizing: 'border-box', filter: p.stunned ? 'grayscale(0.5)' : 'none'
+        },
+        badge: p.stunned ? 'STUNNED · NO DIE TOMORROW' : '',
+        badgeStyle: {
+          fontFamily: "'Space Mono', monospace", fontSize: '8px', fontWeight: 700, letterSpacing: '0.08em',
+          background: '#C0442E', color: '#FFF6F2', borderRadius: '999px', padding: '2px 6px'
+        },
+        lastSeen: empty ? 'Has not rolled yet' : p.lastSeen,
+        lastSeenStyle: {
+          fontSize: '11px', lineHeight: 1.25, color: '#7A705F', overflow: 'hidden',
+          textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+        }
+      };
+    });
+
+    const pmap = {};
+    PLAYERS.forEach(p => { pmap[p.id] = p; });
+    const feed = empty ? [] : FEED.map(f => {
+      const p = f.who ? pmap[f.who] : null;
+      const m = KIND_META[f.kind];
+      const loud = f.kind === 'use';
+      return {
+        text: f.text, time: f.t, kind: m.label,
+        initials: p ? p.initials : '◷',
+        rowStyle: {
+          display: 'flex', gap: '9px', alignItems: 'flex-start', padding: '9px 10px 9px 12px',
+          borderRadius: '8px', position: 'relative', overflow: 'hidden',
+          background: loud ? '#F3EBFA' : '#FFFDF7',
+          border: '1px solid ' + (loud ? 'rgba(122,52,168,0.28)' : 'rgba(36,31,26,0.09)')
+        },
+        railStyle: { position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: m.color },
+        avatarStyle: {
+          width: '26px', height: '26px', borderRadius: '999px', flex: '0 0 auto',
+          background: p ? p.color : '#D8CCB8', color: p ? '#FFF9EE' : '#5C5349',
+          fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: '11px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
+        },
+        textStyle: {
+          fontSize: loud ? '14px' : '13px', lineHeight: 1.32,
+          fontWeight: loud ? 700 : 500, color: '#241F1A'
+        },
+        kindStyle: {
+          fontFamily: "'Space Mono', monospace", fontSize: '9px', fontWeight: 700,
+          letterSpacing: '0.1em', color: m.color
+        }
+      };
+    });
+
+    const leader = sorted[0];
+    const leaderBlock = empty ? 'Nobody has rolled yet.' : leader.name + ' · tile ' + leader.tile;
+
+    return {
+      seasonName: this.props.seasonName || 'The Long Climb',
+      dayNum: empty ? 1 : 12, dayTotal: 30, daysLeft: empty ? 29 : 18,
+      progressStyle: { height: '100%', width: (empty ? 3 : 40) + '%', background: '#C8A15E', borderRadius: '999px' },
+      leaderBlock, tiles, connectors, legend, standings, feed,
+      feedEmpty: empty ? 'y' : '',
+      hasMore: empty ? '' : 'y',
+      feedMeta: empty ? 'NO ACTIONS YET' : 'NEWEST FIRST',
+      startTokens: empty ? players.map(p => this.token(p, 20)) : [],
+      startNote: empty ? 'All 8 players at the start line.' : 'Everyone is on the board.'
+    };
+  }
+}
+</script>
+</body>
+</html>
