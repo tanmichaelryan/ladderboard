@@ -1,0 +1,11 @@
+{
+  "name": "ladderboard-dev",
+  "private": true,
+  "description": "Local test + preview harness for the apps-script/ game. Not deployed — clasp's rootDir is apps-script/, so nothing here is ever pushed.",
+  "scripts": {
+    "test": "TZ=UTC node --test test/",
+    "preview": "TZ=UTC node tools/preview.js"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

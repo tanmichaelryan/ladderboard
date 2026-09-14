@@ -111,21 +111,44 @@ Use the **Ladderboard Admin** menu on the Sheet itself (appears after
   safe to run once right after adding a new tab (e.g. `Mines`) to
   `SHEET_SCHEMA_` on a spreadsheet from before that change.
 
-## What's intentionally not here
+## Testing and previewing locally, before any `clasp push`
 
-No `node:test`-style automated tests — Apps Script doesn't run one. Instead,
-`Tests.gs` holds a small `runTests()` you run from the editor's function
-dropdown (View → Logs for PASS/FAIL/SKIP), covering the nickname validator,
-the `getLastSeenAll_`/`getLastSeen_` equivalence a performance fix depends
-on, and every power-up rule extracted as a pure function — the gacha draw
-count, the ACTION_KINDS_/KIND_META_ and item-catalog coverage that keep the
-feed and bag from throwing or rendering blank, PULL's distance/target rules,
-WINDBLOWN/THUNDER's targeting exclusions, and the landmine tile-privacy
-invariant (`mineActionNotes_` must never mention the tile it's called with).
-The rest of the engine logic was checked against an ad hoc in-memory Sheets
-emulator during development — dice, rolls, shortcuts/setbacks resolution, every power-up's
-effect including the shield-block case and the mine soft-delete, the
-idempotent daily reset, and both privacy invariants (a pickup's feed text
-never names the item granted; another player's bag or mines never render in
-your page). If you change game rules here, re-verify by hand against those
-same invariants.
+Apps Script itself doesn't run `node:test` — but everything in this folder
+is plain ES5 JavaScript with a small, known surface of platform globals
+(`SpreadsheetApp`, `Session`, `LockService`, `HtmlService`, `Logger`), so
+`test/` and `tools/preview.js` at the **repo root** load the real `.gs`
+files into a Node `vm` context seeded with fake versions of those globals —
+an in-memory stand-in Sheet included — and run the actual game logic
+against them. Zero npm dependencies (`node:test`, `node:vm`, `node:http`
+only); neither directory is read by `clasp` (its `rootDir` is this folder),
+so none of it is ever pushed or deployed.
+
+```
+npm test      # every pure rule, engine flow, privacy invariant, and entry
+              # point — roll_/useItem_/ensureDailyReset_ through a fake
+              # Sheet, every render*_ function, doGet/serverRoll/
+              # serverUseItem/serverSetName, the LockService re-entrancy
+              # hazard Use.gs's 'double' comment warns about, and the
+              # google.script.run trailing-"_" visibility rule (a server
+              # function named with a trailing underscore is private and
+              # unreachable from the client — see rpc.js)
+npm run preview   # a real browser preview of doGet() itself: two local
+                  # servers on genuinely different origins (:3000/:3001),
+                  # reproducing the HtmlService sandboxed-iframe boundary
+                  # closely enough to catch cross-origin bugs before a
+                  # deploy — see tools/preview.js's header comment
+```
+
+`Tests.gs` is what's left for a **post-deploy** smoke check: the two things
+that only exist on a real Google Sheet, not the local harness's in-memory
+one — `validateDisplayName_`'s uniqueness check against this spreadsheet's
+actual Players rows, and `getLastSeenAll_` vs `getLastSeen_` against its
+actual Actions rows. Run it from the editor's function dropdown
+(`runTests`, View → Logs for PASS/FAIL/SKIP) after any deploy touching
+Names.gs or Repo.gs's `getLastSeenAll_`. Everything else it used to cover —
+every pure rule in Derive.gs/Names.gs/Roll.gs/Use.gs/Theme.gs, the engine
+flows, the privacy invariants (a pickup's feed text never names the item
+granted; another player's bag or mines never render in your page; a mine's
+tile stays hidden until it triggers) — now runs locally via `npm test`,
+which is both faster and (unlike the editor) runs on every change without
+a push.
