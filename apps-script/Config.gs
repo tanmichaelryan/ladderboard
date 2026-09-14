@@ -7,10 +7,20 @@
 // deployment steps, and README.md in this folder for how it all fits
 // together.
 
-// Set this to your Workspace domain. Anyone opening the deployed web app
-// whose Google account email doesn't end in "@" + TEAM_DOMAIN is refused —
-// this is the equivalent of the original app's `hd` claim check.
-var TEAM_DOMAIN = 'example.com';
+// Your Workspace domain. Anyone opening the deployed web app whose Google
+// account email doesn't end in "@" + this domain is refused — the
+// equivalent of the original app's `hd` claim check.
+//
+// Read from a Script Property instead of hardcoded here, so switching
+// domains (or standing up a second deployment for a different team) is a
+// Project Settings edit, not a code change + redeploy. Set it once via the
+// Apps Script editor: Project Settings (gear icon) → Script Properties →
+// add TEAM_DOMAIN. Falls back to 'example.com' (this repo's placeholder)
+// when unset, so a fresh clone/test run still works without that step.
+function getTeamDomain_() {
+  var configured = PropertiesService.getScriptProperties().getProperty('TEAM_DOMAIN');
+  return (configured || 'example.com').toLowerCase();
+}
 
 // The season's board and duration — edit and redeploy (clasp push) to run a
 // different board. Not sheet-backed: this project has no build step, so "at
