@@ -3,13 +3,16 @@
 // if a ladder/snake was hit, sliding along the drawn connector to its
 // destination. Inlined into the page by RenderPage.gs, exposed as
 // window.LadderAnim so it's addressable both from the console's Roll button
-// (RenderConsole.gs) and by hand from the browser console when iterating on
-// dev/preview.html — see that file's header comment.
+// (RenderConsole.gs) and by hand from the browser console when iterating
+// against the local preview server (tools/preview.js at the repo root —
+// `npm run preview`, then http://localhost:3000/).
 //
 // Deliberately decoupled from google.script.run: LadderAnim.play(result)
-// takes the plain object serverRoll (Code.gs) returns and owns the
-// eventual location.reload() itself, so it can be exercised against
-// hand-written fixture objects with no server round-trip at all.
+// takes the plain object serverRoll (Code.gs) returns and owns triggering
+// the eventual board refresh (refreshBoard_, RenderPage.gs) itself, so the
+// animation portion can still be exercised against hand-written fixture
+// objects — the reload() wrapper below swallows the case where
+// refreshBoard_ isn't defined or google.script.run isn't available.
 //
 // Failure safety is the point of this file's structure, not an
 // afterthought: every path — missing DOM, a null/no-op result, a bug in the
@@ -160,12 +163,11 @@ var LadderAnim = (function () {
 
   function play(result) {
     var settled = false;
-    // The page runs inside HtmlService's IFRAME sandbox, so plain
-    // location.reload() only re-fetches the iframe's cached googleusercontent.com
-    // snapshot rather than re-running doGet() — the board looks refreshed but the
-    // data is stale. Reload the top window instead to force a real re-fetch.
+    // refreshBoard_ (RenderPage.gs) re-renders the page's regions in place via
+    // google.script.run rather than navigating — see that file's comment for
+    // why a real reload() doesn't work inside HtmlService's sandboxed iframe.
     var reload = function () {
-      try { top.location.reload(); } catch (e) { try { location.reload(); } catch (e2) {} }
+      try { refreshBoard_(); } catch (e) {}
     };
 
     return new Promise(function (finish) {

@@ -163,6 +163,17 @@ a:hover { color: #8F2F1F; text-decoration: underline; }
 
 .regions-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
 
+/* Each region's card carries its own flex-basis/min-width, but RenderPage.gs
+   wraps every region in a plain #region-* div (so refreshBoard_ has a
+   stable innerHTML target) — that wrapper, not the card, is the actual
+   flex item .regions-row sees. Without matching sizing here the wrapper
+   shrinks to fit its content instead of growing, squashing the
+   board/standings/feed cards down to tiny. */
+#region-board, #region-standings, #region-feed { display: flex; flex: 1 1 auto; min-width: 0; }
+#region-board { flex-basis: 420px; min-width: 296px; }
+#region-standings { flex-basis: 240px; min-width: 220px; }
+#region-feed { flex-basis: 100%; }
+
 /* ---------- Region B: the board ---------- */
 
 .board-card { flex: 1 1 360px; min-width: 296px; padding: 10px; }

@@ -31,8 +31,9 @@ function requireIdentity_() {
   if (!email) {
     throw new Error('Could not verify your Google identity. Open this page while signed into your work Google account.');
   }
-  if (emailDomain_(email) !== TEAM_DOMAIN.toLowerCase()) {
-    throw new Error('This board is only for ' + TEAM_DOMAIN + '. You are signed in as ' + email + '.');
+  var teamDomain = getTeamDomain_();
+  if (emailDomain_(email) !== teamDomain) {
+    throw new Error('This board is only for ' + teamDomain + '. You are signed in as ' + email + '.');
   }
   return email;
 }
@@ -127,6 +128,32 @@ function serverUseItem(item, args) {
     // validate-before-decrement ordering in Use.gs).
     useItem_(player.id, item, cleanArgs, new Date());
     return true;
+  });
+}
+
+// Re-renders the regions of the page that any console action can change,
+// for refreshBoard_ (RenderPage.gs) to splice back in via innerHTML instead
+// of navigating — see that file's comment for why a real reload doesn't
+// work inside HtmlService's sandboxed iframe. Mirrors handleHtmlApp_'s
+// per-request work (daily reset, view build) but returns HTML fragments
+// instead of a full document.
+function serverRefreshView() {
+  return withLock_(function () {
+    var email = requireIdentity_();
+    ensureDailyReset(new Date());
+    var player = getPlayerByEmail_(email);
+    if (!player) throw new Error('Not enrolled yet — reload the page first.');
+    var view = buildPlayerView_(player.id, new Date());
+    return {
+      header: String(renderHeader_(view)),
+      board: String(renderBoard_(view)),
+      standings: String(renderStandings_(view)),
+      feed: String(renderFeed_(view)),
+      console: '<div id="console-error" class="console-error" hidden></div>' +
+        String(view.me.needsName ? renderOnboarding_(view) : renderConsole_(view)),
+      updatedAtIso: view.updatedAtIso,
+      updatedAtText: absoluteUtc_(view.updatedAtIso)
+    };
   });
 }
 
