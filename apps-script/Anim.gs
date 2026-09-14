@@ -160,7 +160,13 @@ var LadderAnim = (function () {
 
   function play(result) {
     var settled = false;
-    var reload = function () { try { location.reload(); } catch (e) {} };
+    // The page runs inside HtmlService's IFRAME sandbox, so plain
+    // location.reload() only re-fetches the iframe's cached googleusercontent.com
+    // snapshot rather than re-running doGet() — the board looks refreshed but the
+    // data is stale. Reload the top window instead to force a real re-fetch.
+    var reload = function () {
+      try { top.location.reload(); } catch (e) { try { location.reload(); } catch (e2) {} }
+    };
 
     return new Promise(function (finish) {
       function done() {
