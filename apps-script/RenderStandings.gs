@@ -30,11 +30,6 @@ function renderStandings_(view) {
     <div class="card standings-card">
       <div class="card-header">
         <div class="display card-title">Standings</div>
-        <div class="mono card-eyebrow">BAGS ARE PRIVATE</div>
-      </div>
-      <div class="privacy-note">
-        Nobody can see what anyone is holding. You find out someone had a Shield when it stops your hit.
-        Check your own bag <code>/bag</code> — it's the panel above once you're on the board.
       </div>
       <div class="standings-list">
         ${view.standings.map(standingsRow_)}

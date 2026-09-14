@@ -13,14 +13,13 @@ var STYLE_CSS_ = `
   /* surfaces */
   --page-bg: #EDE4D4;
   --card: #FBF6EC;
-  --tile-even: #FFFDF7;
-  --tile-odd: #F7F1E4;
+  --tile-even: #FFFFFF;
+  --tile-odd: #FFFFFF;
   --ink: #241F1A;
   --slab-inset: #332C25;
   --progress-track: #433B32;
   --dashed-border: #C9BCA6;
   --divider-dashed: #D8CCB8;
-  --privacy-bg: #F4EDDF;
   --inline-code-bg: #E7DFCF;
 
   /* text */
@@ -39,6 +38,9 @@ var STYLE_CSS_ = `
   --gold: #C8A15E;
   --gold-strong: #B4791A;
   --gold-tint: #FBEFD2;
+  --blue: #3E7BC4;
+  --blue-strong: #2A5D9E;
+  --blue-tint: #DCEAF8;
   --green: #2F7D4F;
   --green-tint: #DCF0E1;
   --green-tint-2: #E9F4EB;
@@ -198,7 +200,7 @@ a:hover { color: #8F2F1F; text-decoration: underline; }
 }
 .tile--plain-even { background: var(--tile-even); }
 .tile--plain-odd { background: var(--tile-odd); }
-.tile--power { background: var(--gold-tint); }
+.tile--power { background: var(--blue-tint); }
 .tile--shortcut-foot { background: var(--green-tint); border-color: rgba(47, 125, 79, 0.45); }
 .tile--shortcut-top { background: var(--green-tint-2); }
 .tile--setback-head { background: var(--red-tint); border-color: rgba(192, 68, 46, 0.45); }
@@ -216,7 +218,7 @@ a:hover { color: #8F2F1F; text-decoration: underline; }
   display: flex; align-items: center; justify-content: center;
   font-size: 10px; line-height: 1;
 }
-.tile--power .tile-glyph { color: var(--gold-strong); }
+.tile--power .tile-glyph { color: var(--blue-strong); }
 .tile--shortcut-foot .tile-glyph { color: var(--green); }
 .tile--setback-head .tile-glyph { color: var(--red); }
 .tile--finish .tile-glyph { color: var(--gold); }
@@ -355,22 +357,13 @@ a:hover { color: #8F2F1F; text-decoration: underline; }
 .legend-swatch { width: 11px; height: 11px; border-radius: 3px; border: 1px solid; }
 .legend-shortcut { background: var(--green-tint); border-color: rgba(47, 125, 79, 0.5); }
 .legend-setback { background: var(--red-tint); border-color: rgba(192, 68, 46, 0.5); }
-.legend-power { background: var(--gold-tint); border-color: rgba(180, 121, 26, 0.5); }
+.legend-power { background: var(--blue-tint); border-color: rgba(42, 93, 158, 0.5); }
 .legend-finish { background: var(--ink); border-color: var(--ink); }
 .legend-label { font-size: 9px; letter-spacing: 0.06em; color: var(--text-muted); white-space: nowrap; }
 
 /* ---------- Region C: standings ---------- */
 
-.standings-card { flex: 1 1 300px; min-width: 280px; }
-
-.privacy-note {
-  font-size: 11px; line-height: 1.35; color: var(--text-muted-3);
-  background: var(--privacy-bg); border-radius: 7px; padding: 7px 9px; margin-top: -3px;
-}
-.privacy-note code {
-  font-family: 'Space Mono', monospace; background: var(--inline-code-bg);
-  padding: 1px 4px; border-radius: 3px;
-}
+.standings-card { flex: 1 1 240px; min-width: 220px; }
 
 .standings-list { display: flex; flex-direction: column; gap: 6px; }
 
